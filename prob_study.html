@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>STAT221 확률론 개념 정리</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap');
+
+  :root {
+    --bg: #0d0f14;
+    --bg2: #13161e;
+    --bg3: #1a1f2e;
+    --border: #252b3b;
+    --text: #e2e8f4;
+    --muted: #7a86a0;
+    --accent: #5b8dee;
+    --accent2: #a78bfa;
+    --accent3: #34d399;
+    --accent4: #f59e0b;
+    --red: #f87171;
+    --card: #161b28;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 15px;
+    line-height: 1.75;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    background: rgba(13,15,20,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    gap: 0;
+    overflow-x: auto;
+  }
+  nav::-webkit-scrollbar { height: 0; }
+  .nav-logo {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--accent);
+    white-space: nowrap;
+    margin-right: 2rem;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+  }
+  .nav-links {
+    display: flex;
+    gap: 0;
+    list-style: none;
+  }
+  .nav-links a {
+    display: block;
+    padding: 0 0.75rem;
+    font-size: 12.5px;
+    color: var(--muted);
+    text-decoration: none;
+    white-space: nowrap;
+    transition: color 0.2s;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+  }
+  .nav-links a:hover { color: var(--accent); }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 6rem 2rem 4rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(91,141,238,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(91,141,238,0.04) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none;
+  }
+  .hero-glow {
+    position: absolute;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(91,141,238,0.12) 0%, transparent 70%);
+    top: 50%; left: 50%; transform: translate(-50%, -60%);
+    pointer-events: none;
+  }
+  .hero-tag {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    border: 1px solid rgba(91,141,238,0.3);
+    padding: 4px 14px;
+    border-radius: 2px;
+    margin-bottom: 1.5rem;
+  }
+  .hero h1 {
+    font-family: 'Merriweather', serif;
+    font-size: clamp(2rem, 5vw, 3.6rem);
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 0.75rem;
+    letter-spacing: -0.02em;
+  }
+  .hero h1 span { color: var(--accent); }
+  .hero-sub {
+    font-size: 16px;
+    color: var(--muted);
+    max-width: 560px;
+    margin: 0 auto 2.5rem;
+  }
+  .hero-cards {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .hero-pill {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .hero-pill span { color: var(--text); }
+
+  /* ── MAIN ── */
+  main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 4rem 2rem 6rem;
+  }
+
+  /* ── CHAPTER HEADER ── */
+  .ch-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 4rem 0 2rem;
+  }
+  .ch-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    border: 1px solid rgba(91,141,238,0.3);
+    padding: 3px 10px;
+    border-radius: 2px;
+    white-space: nowrap;
+  }
+  .ch-line { flex: 1; height: 1px; background: var(--border); }
+  .ch-header h2 {
+    font-family: 'Merriweather', serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text);
+    white-space: nowrap;
+  }
+
+  /* ── CARD ── */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1.75rem;
+    margin-bottom: 1.25rem;
+    position: relative;
+  }
+  .card-accent-l {
+    border-left: 3px solid var(--accent);
+  }
+  .card-accent-v {
+    border-left: 3px solid var(--accent2);
+  }
+  .card-accent-g {
+    border-left: 3px solid var(--accent3);
+  }
+  .card-accent-y {
+    border-left: 3px solid var(--accent4);
+  }
+  .card-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.6rem;
+    opacity: 0.8;
+  }
+  .card-label.purple { color: var(--accent2); }
+  .card-label.green { color: var(--accent3); }
+  .card-label.yellow { color: var(--accent4); }
+  .card h3 {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    color: var(--text);
+  }
+  .card p {
+    color: var(--muted);
+    font-size: 14px;
+    margin-bottom: 0.6rem;
+  }
+  .card p:last-child { margin-bottom: 0; }
+  .card p strong { color: var(--text); font-weight: 600; }
+  .card p em { color: var(--accent3); font-style: normal; font-weight: 500; }
+
+  /* ── MATH BOX ── */
+  .math-box {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1rem 1.25rem;
+    margin: 0.75rem 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--accent2);
+    line-height: 2;
+    overflow-x: auto;
+  }
+  .math-box .comment {
+    color: var(--muted);
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 12px;
+  }
+
+  /* ── GRID 2COL ── */
+  .grid2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+  }
+  @media (max-width: 640px) { .grid2 { grid-template-columns: 1fr; } }
+
+  /* ── TABLE ── */
+  .concept-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+    margin: 0.75rem 0;
+  }
+  .concept-table th {
+    background: var(--bg3);
+    color: var(--accent);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    padding: 8px 14px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    font-weight: 500;
+  }
+  .concept-table td {
+    padding: 8px 14px;
+    border-bottom: 1px solid var(--border);
+    color: var(--muted);
+    vertical-align: top;
+  }
+  .concept-table td strong { color: var(--text); }
+  .concept-table tr:last-child td { border-bottom: none; }
+  .concept-table tr:hover td { background: rgba(91,141,238,0.04); }
+
+  /* ── PROOF BOX ── */
+  .proof-box {
+    background: linear-gradient(135deg, rgba(167,139,250,0.05), rgba(91,141,238,0.05));
+    border: 1px solid rgba(167,139,250,0.2);
+    border-radius: 6px;
+    padding: 1.25rem 1.5rem;
+    margin: 0.75rem 0;
+  }
+  .proof-box .proof-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--accent2);
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+  .proof-box p {
+    font-size: 13.5px;
+    color: var(--muted);
+  }
+  .proof-box p strong { color: var(--text); }
+
+  /* ── KEY INSIGHT ── */
+  .insight {
+    background: linear-gradient(135deg, rgba(52,211,153,0.06), rgba(91,141,238,0.06));
+    border: 1px solid rgba(52,211,153,0.2);
+    border-radius: 6px;
+    padding: 1rem 1.25rem;
+    margin: 0.75rem 0;
+    font-size: 13.5px;
+  }
+  .insight-title {
+    font-size: 11px;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--accent3);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 0.4rem;
+  }
+  .insight p { color: var(--muted); }
+  .insight p strong { color: var(--text); }
+
+  /* ── DIVIDER ── */
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+    margin: 3rem 0;
+  }
+
+  /* ── FLOW ── */
+  .flow {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin: 0.75rem 0;
+    font-size: 13px;
+  }
+  .flow-step {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    padding: 4px 12px;
+    border-radius: 3px;
+    color: var(--text);
+  }
+  .flow-arrow { color: var(--accent); font-weight: 700; }
+
+  /* ── TAGS ── */
+  .tag {
+    display: inline-block;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 2px;
+    font-family: 'JetBrains Mono', monospace;
+    margin: 2px;
+  }
+  .tag-blue { background: rgba(91,141,238,0.15); color: var(--accent); border: 1px solid rgba(91,141,238,0.2); }
+  .tag-purple { background: rgba(167,139,250,0.15); color: var(--accent2); border: 1px solid rgba(167,139,250,0.2); }
+  .tag-green { background: rgba(52,211,153,0.12); color: var(--accent3); border: 1px solid rgba(52,211,153,0.2); }
+  .tag-yellow { background: rgba(245,158,11,0.12); color: var(--accent4); border: 1px solid rgba(245,158,11,0.2); }
+
+  /* ── BACK TO TOP ── */
+  .backtop {
+    position: fixed;
+    bottom: 2rem; right: 2rem;
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    width: 40px; height: 40px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 16px;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+  .backtop:hover { color: var(--accent); border-color: var(--accent); }
+
+  /* ── SECTION ANCHOR ── */
+  section { scroll-margin-top: 72px; }
+
+  /* ── STEP LIST ── */
+  .steps { list-style: none; padding: 0; margin: 0.5rem 0; }
+  .steps li {
+    display: flex;
+    gap: 0.75rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(37,43,59,0.5);
+    font-size: 13.5px;
+    align-items: flex-start;
+  }
+  .steps li:last-child { border-bottom: none; }
+  .step-num {
+    min-width: 22px; height: 22px;
+    background: rgba(91,141,238,0.15);
+    color: var(--accent);
+    border-radius: 2px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 2px;
+    font-weight: 600;
+  }
+  .steps li p { color: var(--muted); margin: 0; }
+  .steps li p strong { color: var(--text); }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 2rem;
+    text-align: center;
+    font-size: 12px;
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* fade-in on scroll */
+  .fade-in {
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+  .fade-in.visible {
+    opacity: 1;
+    transform: none;
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">STAT221</div>
+  <ul class="nav-links">
+    <li><a href="#crv">연속 확률변수</a></li>
+    <li><a href="#transform">변수변환</a></li>
+    <li><a href="#joint">결합분포</a></li>
+    <li><a href="#independence">독립성</a></li>
+    <li><a href="#conv">합성곱</a></li>
+    <li><a href="#covariance">공분산</a></li>
+    <li><a href="#lln">대수의 법칙</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-tag">Korea University · STAT221 · 2026 Spring</div>
+  <h1>확률론 <span>핵심 개념</span><br>한눈에 정리</h1>
+  <p class="hero-sub">연속 확률변수부터 결합분포, 대수의 법칙까지 — 복잡한 수식을 직관적으로 이해할 수 있도록 정리했습니다.</p>
+  <div class="hero-cards">
+    <div class="hero-pill"><span>연속 확률변수</span> · PDF / CDF</div>
+    <div class="hero-pill"><span>결합분포</span> · 주변화 · 독립성</div>
+    <div class="hero-pill"><span>합성곱</span> · 변수변환</div>
+    <div class="hero-pill"><span>대수의 법칙</span> · 강수렴</div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<main>
+
+  <!-- ────────── CH1: 연속 확률변수 ────────── -->
+  <section id="crv">
+    <div class="ch-header fade-in">
+      <div class="ch-num">CH 01</div>
+      <h2>연속 확률변수</h2>
+      <div class="ch-line"></div>
+    </div>
+
+    <div class="card card-accent-l fade-in">
+      <div class="card-label">Definition 4.1.1</div>
+      <h3>확률밀도함수 (PDF)</h3>
+      <p>연속 확률변수 <strong>X</strong>는 음이 아닌 함수 <em>f<sub>X</sub></em>가 존재해, 모든 a ≤ b에 대해 다음을 만족할 때 정의됩니다.</p>
+      <div class="math-box">
+        P(a ≤ X ≤ b) = ∫[a→b] f_X(x) dx<br>
+        <span class="comment">// PDF는 확률 자체가 아니라 "단위 길이당 확률 질량"</span>
+      </div>
+      <div class="insight">
+        <div class="insight-title">💡 직관</div>
+        <p>PDF 값 자체가 확률은 아닙니다. <strong>f<sub>X</sub>(x) · δ ≈ P(x ≤ X ≤ x+δ)</strong>처럼, 아주 짧은 구간의 확률을 근사할 때 씁니다. CDF를 x로 미분하면 PDF가 됩니다.</p>
+      </div>
+    </div>
+
+    <div class="grid2 fade-in">
+      <div class="card card-accent-v">
+        <div class="card-label purple">기본 성질</div>
+        <h3>PDF 필수 조건</h3>
+        <ul class="steps">
+          <li><div class="step-num">①</div><p><strong>정규화:</strong> ∫₋∞^∞ f_X(x)dx = 1</p></li>
+          <li><div class="step-num">②</div><p><strong>점 확률 = 0:</strong> P(X = a) = 0</p></li>
+          <li><div class="step-num">③</div><p><strong>등가성:</strong> P(a≤X≤b) = P(a&lt;X&lt;b)</p></li>
+        </ul>
+      </div>
+      <div class="card card-accent-g">
+        <div class="card-label green">Theorem 4.1.1</div>
+        <h3>CDF와 PDF의 관계</h3>
+        <div class="math-box">
+          F_X(x) = ∫₋∞^x f_X(t) dt<br><br>
+          dF_X/dx = f_X(x)
+        </div>
+        <p>CDF를 미분하면 PDF, PDF를 적분하면 CDF</p>
+      </div>
+    </div>
+
+    <div class="card card-accent-y fade-in">
+      <div class="card-label yellow">주요 분포 3가지</div>
+      <h3>대표 연속 분포 비교</h3>
+      <table class="concept-table">
+        <tr>
+          <th>분포</th><th>표기</th><th>PDF</th><th>의미</th>
+        </tr>
+        <tr>
+          <td><strong>균등분포</strong></td>
+          <td><span class="tag tag-blue">Uniform(a,b)</span></td>
+          <td>1/(b−a) on [a,b]</td>
+          <td>구간 내 어디서나 같은 확률</td>
+        </tr>
+        <tr>
+          <td><strong>지수분포</strong></td>
+          <td><span class="tag tag-purple">Exp(λ)</span></td>
+          <td>λe^(−λx), x≥0</td>
+          <td>사건 발생까지의 대기 시간</td>
+        </tr>
+        <tr>
+          <td><strong>가우시안</strong></td>
+          <td><span class="tag tag-green">N(μ, σ²)</span></td>
+          <td>(2πσ²)^(−½) exp{−(x−μ)²/2σ²}</td>
+          <td>μ: 위치, σ: 퍼짐 정도</td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="card card-accent-l fade-in">
+      <div class="card-label">Theorem 4.2.3 — Jensen 부등식</div>
+      <h3>볼록함수와 기댓값의 관계</h3>
+      <p>함수 g가 <strong>볼록(convex)</strong>이면: <em>E[g(X)] ≥ g(E[X])</em></p>
+      <p>함수 g가 <strong>오목(concave)</strong>이면: <em>E[g(X)] ≤ g(E[X])</em></p>
+      <div class="insight">
+        <div class="insight-title">💡 예시</div>
+        <p>g(x) = x² (볼록) → <strong>E[X²] ≥ (E[X])²</strong> → Var(X) ≥ 0 임을 확인할 수 있음.<br>
+        대수의 법칙 증명에서 E|X₁−μ|² 의 제곱 ≤ E|X₁−μ|⁴ 를 보일 때 사용됩니다.</p>
+      </div>
+    </div>
+
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ────────── CH2: 변수변환 ────────── -->
+  <section id="transform">
+    <div class="ch-header fade-in">
+      <div class="ch-num">CH 02</div>
+      <h2>변수변환 (Change of Variable)</h2>
+      <div class="ch-line"></div>
+    </div>
+
+    <div class="card card-accent-l fade-in">
+      <div class="card-label">Theorem 4.1.2 (핵심)</div>
+      <h3>1변수 변환 공식</h3>
+      <p>X의 PDF가 f<sub>X</sub>이고 Y = φ(X)로 변환할 때, φ가 미분가능하고 φ'이 연속·비영이면:</p>
+      <div class="math-box">
+        f_Y(y) = f_X(φ⁻¹(y)) · |dφ⁻¹/dy|<br>
+                = f_X(φ⁻¹(y)) · |1 / φ'(φ⁻¹(y))|
+      </div>
+      <div class="insight">
+        <div class="insight-title">💡 핵심 아이디어</div>
+        <p>역함수 정리(Inverse Function Theorem)를 이용해서 |dφ⁻¹/dy| = |1/φ'(x)|임을 보입니다. φ'&gt;0이면 단조증가, φ'&lt;0이면 단조감소 각각 다르게 CDF를 다룬 뒤 미분합니다.</p>
+      </div>
+      <div class="proof-box">
+        <div class="proof-title">증명 핵심 흐름</div>
+        <p>① CDF 구하기: φ' &gt; 0이면 F_Y(y) = P(Y≤y) = P(X≤φ⁻¹(y)) = (F_X∘φ⁻¹)(y)<br>
+        ② φ' &lt; 0이면 F_Y(y) = 1 − (F_X∘φ⁻¹)(y)<br>
+        ③ 미분 → chain rule + 역함수 정리 → 위 공식 도출</p>
+      </div>
+    </div>
+
+    <div class="card card-accent-v fade-in">
+      <div class="card-label purple">Theorem 4.1.3</div>
+      <h3>확률 적분 변환 (Probability Integral Transform)</h3>
+      <p>X의 CDF F<sub>X</sub>가 연속이고 순증가이면:</p>
+      <div class="math-box">
+        Y = F_X(X) ~ Uniform(0,1)   <span class="comment">// CDF로 변환하면 균등분포</span><br>
+        F_X⁻¹(U) ≅ X,  U ~ Uniform(0,1)  <span class="comment">// 역변환으로 샘플링 가능</span>
+      </div>
+      <div class="insight">
+        <div class="insight-title">💡 응용</div>
+        <p>이 정리를 이용하면 <strong>어떤 분포에서든 샘플링</strong>이 가능합니다. 균등분포 난수 u를 생성 → F_X⁻¹(u) 계산 → X의 샘플 획득. Box-Muller 변환도 이 원리 기반.</p>
+      </div>
+    </div>
+
+    <div class="card card-accent-g fade-in">
+      <div class="card-label green">Theorem 4.1.4</div>
+      <h3>비단조 함수의 변환</h3>
+      <p>φ가 단조가 아닐 경우 (예: Y = X²), <strong>구간을 분할</strong>해서 각 단조 구간의 역함수를 합산합니다.</p>
+      <div class="math-box">
+        f_Y(y) = Σᵢ f_X(φᵢ⁻¹(y)) · |1/φᵢ'(φᵢ⁻¹(y))|
+      </div>
+      <p>예: Y = X²일 때 x&gt;0 구간과 x&lt;0 구간으로 분할하여:</p>
+      <div class="math-box">
+        f_Y(y) = f_X(√y)·(1/2√y) + f_X(−√y)·(1/2√y)  (y &gt; 0)
+      </div>
+    </div>
+
+    <div class="card card-accent-y fade-in">
+      <div class="card-label yellow">Theorem 5.3.1 — 이변수 변환</div>
+      <h3>다변수 변환과 야코비안</h3>
+      <p>(X₁, X₂) → (Y₁, Y₂) = (φ₁(X₁,X₂), φ₂(X₁,X₂)) 변환 시:</p>
+      <div class="math-box">
+        f_{Y₁,Y₂}(y₁,y₂) = f_{X₁,X₂}(φ₁⁻¹(y₁,y₂), φ₂⁻¹(y₁,y₂)) · |J(y₁,y₂)|<br><br>
+        J(y₁,y₂) = det(∂φᵢ/∂yⱼ)  <span class="comment">// 야코비안 행렬식</span>
+      </div>
+      <div class="insight">
+        <div class="insight-title">💡 Box-Muller 변환</div>
+        <p>U₁, U₂ ~ Uniform(0,1) 독립일 때:<br>
+        <strong>Z₀ = √(−2 ln U₁) cos(2πU₂)</strong> ~ N(0,1)<br>
+        <strong>Z₁ = √(−2 ln U₁) sin(2πU₂)</strong> ~ N(0,1)<br>
+        이 변환이 야코비안을 통해 증명됩니다.</p>
+      </div>
+    </div>
+
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ────────── CH3: 결합분포 ────────── -->
+  <section id="joint">
+    <div class="ch-header fade-in">
+      <div class="ch-num">CH 03</div>
+      <h2>결합분포 (Joint Distributions)</h2>
+      <div class="ch-line"></div>
+    </div>
+
+    <div class="card card-accent-l fade-in">
+      <div class="card-label">Definition 5.1.1</div>
+      <h3>결합 PDF</h3>
+      <p>두 연속 확률변수 X, Y에 대해 결합 PDF f<sub>X,Y</sub>는 다음을 만족합니다:</p>
+      <div class="math-box">
+        P((X,Y) ∈ A×B) = ∫_B ∫_A f_{X,Y}(x,y) dx dy<br><br>
+        ∫_ℝ ∫_ℝ f_{X,Y}(x,y) dx dy = 1   <span class="comment">// 전체 합 = 1</span>
+      </div>
+    </div>
+
+    <div class="grid2 fade-in">
+      <div class="card card-accent-v">
+        <div class="card-label purple">Definition 5.1.2</div>
+        <h3>결합 CDF</h3>
+        <div class="math-box">
+          F_{X,Y}(x,y) = P(X≤x, Y≤y)<br>
+                        = ∫₋∞^y ∫₋∞^x f_{X,Y}(s,t) ds dt
+        </div>
+        <p>반대로 2차 편미분하면 PDF 복원:</p>
+        <div class="math-box">
+          f_{X,Y}(x,y) = ∂²F_{X,Y}/∂x∂y
+        </div>
+      </div>
+      <div class="card card-accent-g">
+        <div class="card-label green">Theorem 5.1.1 — 주변화</div>
+        <h3>Marginalization</h3>
+        <p>결합 PDF로부터 각 변수의 PDF 도출:</p>
+        <div class="math-box">
+          f_X(x) = ∫_ℝ f_{X,Y}(x,y) dy<br><br>
+          f_Y(y) = ∫_ℝ f_{X,Y}(x,y) dx
+        </div>
+        <p>나머지 변수를 전체 범위에서 <strong>적분으로 소거</strong></p>
+      </div>
+    </div>
+
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ────────── CH4: 독립성 ────────── -->
+  <section id="independence">
+    <div class="ch-header fade-in">
+      <div class="ch-num">CH 04</div>
+      <h2>독립성 & 기댓값 분리</h2>
+      <div class="ch-line"></div>
+    </div>
+
+    <div class="card card-accent-l fade-in">
+      <div class="card-label">Definition 5.2.1 + Theorem 5.2.1</div>
+      <h3>연속 확률변수의 독립</h3>
+      <p>X와 Y가 독립 ⟺ 결합 CDF가 주변 CDF의 곱:</p>
+      <div class="math-box">
+        F_{X,Y}(x,y) = F_X(x) · F_Y(y)
+      </div>
+      <p>더 편리한 동치 조건 (Theorem 5.2.1):</p>
+      <div class="math-box">
+        f_{X,Y}(x,y) = f_X(x) · f_Y(y)   <span class="comment">// 모든 x, y에서</span>
+      </div>
+      <div class="insight">
+        <div class="insight-title">💡 실용 팁 — Theorem 5.2.2</div>
+        <p>결합 지지 영역이 직사각형이고 <strong>f_{X,Y}(x,y) = g(x)·h(y)</strong> 형태로 인수분해되면 → X와 Y는 독립 (g, h가 정확한 PDF일 필요 없음!)</p>
+      </div>
+    </div>
+
+    <div class="card card-accent-v fade-in">
+      <div class="card-label purple">Theorem 5.4.3</div>
+      <h3>독립 시 기댓값 분리</h3>
+      <div class="math-box">
+        E[XY] = E[X] · E[Y]<br>
+        E[f(X)·g(Y)] = E[f(X)] · E[g(Y)]
+      </div>
+      <p>독립이면 함수를 취해도 독립이 유지됩니다. 이는 <strong>공분산 = 0</strong>으로 이어집니다.</p>
+    </div>
+
+    <div class="card card-accent-g fade-in">
+      <div class="card-label green">Theorem 5.4.3 — 분리 가능한 MGF</div>
+      <h3>독립일 때 결합 MGF</h3>
+      <p>X₁, …, Xₙ이 독립이면 결합 MGF는 각 MGF의 곱:</p>
+      <div class="math-box">
+        M_X(t) = ∏ᵢ M_{Xᵢ}(tᵢ)
+      </div>
+      <p>이 성질을 이용하면 독립 확률변수의 합의 분포를 쉽게 구할 수 있습니다.</p>
+    </div>
+
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ────────── CH5: 합성곱 ────────── -->
+  <section id="conv">
+    <div class="ch-header fade-in">
+      <div class="ch-num">CH 05</div>
+      <h2>합성곱 (Convolution)</h2>
+      <div class="ch-line"></div>
+    </div>
+
+    <div class="card card-accent-l fade-in">
+      <div class="card-label">Theorem 5.2.3</div>
+      <h3>독립 확률변수의 합</h3>
+      <p>X₁, X₂가 독립이고 Y = X₁ + X₂이면 Y의 PDF는 합성곱:</p>
+      <div class="math-box">
+        f_Y(y) = (f_{X₁} * f_{X₂})(y) = ∫₋∞^∞ f_{X₁}(y−x₂) f_{X₂}(x₂) dx₂
+      </div>
+      <div class="proof-box">
+        <div class="proof-title">유도 과정</div>
+        <p>① CDF: F_Y(y) = P(X₁+X₂ ≤ y) = ∫∫_{x₁+x₂≤y} f_{X₁}f_{X₂} dx₁dx₂<br>
+        ② y로 미분 → PDF 획득 (Leibniz 적분 미분)</p>
+      </div>
+    </div>
+
+    <div class="card card-accent-v fade-in">
+      <div class="card-label purple">합성곱의 현실 응용</div>
+      <h3>왜 중요한가?</h3>
+      <table class="concept-table">
+        <tr><th>분야</th><th>활용 예시</th></tr>
+        <tr><td><span class="tag tag-blue">이미지 처리</span></td><td>블러, 엠보스, 외곽선 검출 등 커널 연산</td></tr>
+        <tr><td><span class="tag tag-purple">딥러닝</span></td><td>CNN의 Convolutional Layer 이론적 근거</td></tr>
+        <tr><td><span class="tag tag-green">금융</span></td><td>자산 가격 시뮬레이션, 손실 모델</td></tr>
+        <tr><td><span class="tag tag-yellow">물리</span></td><td>열전도 시뮬레이션</td></tr>
+      </table>
+    </div>
+
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ────────── CH6: 공분산 ────────── -->
+  <section id="covariance">
+    <div class="ch-header fade-in">
+      <div class="ch-num">CH 06</div>
+      <h2>공분산 & 모멘트 생성함수</h2>
+      <div class="ch-line"></div>
+    </div>
+
+    <div class="card card-accent-l fade-in">
+      <div class="card-label">Definition 5.4.1</div>
+      <h3>공분산 (Covariance)</h3>
+      <div class="math-box">
+        Cov(X,Y) = E[(X−E[X])(Y−E[Y])]<br>
+                 = E[XY] − E[X]E[Y]
+      </div>
+      <div class="insight">
+        <div class="insight-title">💡 해석</div>
+        <p><strong>Cov &gt; 0</strong>: X 증가 → Y 증가 경향 / <strong>Cov &lt; 0</strong>: 반대 방향 / <strong>Cov = 0</strong>: 선형 무관 (독립은 아닐 수 있음)</p>
+      </div>
+    </div>
+
+    <div class="grid2 fade-in">
+      <div class="card card-accent-v">
+        <div class="card-label purple">Theorem 5.4.2</div>
+        <h3>공분산 성질 (쌍선형)</h3>
+        <div class="math-box">
+          Cov(aX+Z, bY+c)<br>
+          = ab·Cov(X,Y) + b·Cov(Z,Y)
+        </div>
+        <p>대칭성: Cov(X,Y) = Cov(Y,X)</p>
+        <p>Cov(X,X) = Var(X)</p>
+      </div>
+      <div class="card card-accent-g">
+        <div class="card-label green">Definition 5.4.2</div>
+        <h3>결합 MGF</h3>
+        <div class="math-box">
+          M_X(t) = E[e^{t^T X}]<br>
+                 = E[exp(Σᵢ tᵢXᵢ)]
+        </div>
+        <p>독립이면 M_X(t) = ∏ᵢ M_{Xᵢ}(tᵢ)</p>
+      </div>
+    </div>
+
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ────────── CH7: 대수의 법칙 ────────── -->
+  <section id="lln">
+    <div class="ch-header fade-in">
+      <div class="ch-num">CH 07</div>
+      <h2>강대수의 법칙 (Strong LLN)</h2>
+      <div class="ch-line"></div>
+    </div>
+
+    <div class="card card-accent-l fade-in">
+      <div class="card-label">Theorem 7.7 — Strong Law of Large Numbers</div>
+      <h3>정리 (강대수의 법칙)</h3>
+      <p>X₁, X₂, … 가 <strong>i.i.d.</strong>, E[Xᵢ] = μ, E|Xᵢ|⁴ &lt; ∞ 이면:</p>
+      <div class="math-box">
+        P( lim_{n→∞} X̄_n = μ ) = 1<br><br>
+        X̄_n = (1/n) Σᵢ Xᵢ   <span class="comment">// 표본평균</span>
+      </div>
+      <div class="insight">
+        <div class="insight-title">💡 "강" vs "약" 의미</div>
+        <p>약대수의 법칙은 <em>확률 수렴</em>(P(|X̄ₙ−μ|&gt;ε)→0), 강대수의 법칙은 <em>거의 확실한 수렴</em>(P(lim X̄ₙ=μ)=1). 강한 버전이 더 강력한 조건을 보장합니다.</p>
+      </div>
+    </div>
+
+    <div class="card card-accent-v fade-in">
+      <div class="card-label purple">증명 전략 (Analytic Proof)</div>
+      <h3>4단계 증명 흐름</h3>
+      <ul class="steps">
+        <li>
+          <div class="step-num">1</div>
+          <p><strong>E|X̄ₙ−μ|⁴ 계산:</strong> 독립성을 이용해 교차항을 소거하면 E|X̄ₙ−μ|⁴ ≤ 3/n² · E|X₁−μ|⁴</p>
+        </li>
+        <li>
+          <div class="step-num">2</div>
+          <p><strong>마르코프 부등식 적용:</strong> P(|X̄ₙ−μ| ≥ ε) ≤ E|X̄ₙ−μ|⁴ / ε⁴ ≤ 3E|X₁−μ|⁴ / (n²ε⁴)</p>
+        </li>
+        <li>
+          <div class="step-num">3</div>
+          <p><strong>급수 수렴 확인:</strong> Σ P(|X̄ₙ−μ| ≥ ε) ≤ (3E|X₁−μ|⁴/ε⁴) · Σ 1/n² &lt; ∞</p>
+        </li>
+        <li>
+          <div class="step-num">4</div>
+          <p><strong>보렐-칸텔리 보조정리 적용:</strong> 급수가 수렴 → P(|X̄ₙ−μ| ≥ ε i.o.) = 0 → 거의 확실 수렴 증명 완료</p>
+        </li>
+      </ul>
+      <div class="proof-box">
+        <div class="proof-title">Jensen 부등식의 역할</div>
+        <p>증명 중간에 <strong>(E|X₁−μ|²)² ≤ E|X₁−μ|⁴</strong>를 이용합니다. 이는 φ(x) = x²이 볼록함수이므로 Jensen 부등식에서 직접 나옵니다.</p>
+      </div>
+    </div>
+
+    <div class="card card-accent-g fade-in">
+      <div class="card-label green">Borel-Cantelli Lemma (Theorem 7.6)</div>
+      <h3>보렐-칸텔리 보조정리</h3>
+      <p>사건열 A₁, A₂, … 에 대해:</p>
+      <div class="math-box">
+        Σ P(Aₙ) &lt; ∞  ⟹  P(Aₙ i.o.) = 0
+      </div>
+      <p>"i.o. (infinitely often)" = "무한히 자주 일어남" = ∩_N ∪_{n≥N} Aₙ</p>
+      <div class="insight">
+        <div class="insight-title">💡 해석</div>
+        <p>확률의 합이 유한하면, 해당 사건은 유한 번만 일어납니다 (거의 확실하게). 강대수의 법칙 증명의 핵심 도구입니다.</p>
+      </div>
+    </div>
+
+    <div class="card card-accent-y fade-in">
+      <div class="card-label yellow">개념 연결 정리</div>
+      <h3>증명에서 쓰인 도구들</h3>
+      <div class="flow">
+        <div class="flow-step">i.i.d. 가정</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">4차 모멘트 계산</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">Jensen 부등식</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">Markov 부등식</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">Borel-Cantelli</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">a.s. 수렴</div>
+      </div>
+    </div>
+
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ── 핵심 공식 요약 ── -->
+  <section>
+    <div class="ch-header fade-in">
+      <div class="ch-num">정리</div>
+      <h2>핵심 공식 속성표</h2>
+      <div class="ch-line"></div>
+    </div>
+
+    <div class="card fade-in">
+      <table class="concept-table">
+        <tr>
+          <th>공식</th><th>조건</th><th>결과</th>
+        </tr>
+        <tr>
+          <td><strong>Marginalization</strong></td>
+          <td>결합 PDF f_{X,Y} 주어짐</td>
+          <td>f_X(x) = ∫ f_{X,Y}(x,y) dy</td>
+        </tr>
+        <tr>
+          <td><strong>Change of Variable</strong></td>
+          <td>φ 미분가능, φ' 연속·비영</td>
+          <td>f_Y(y) = f_X(φ⁻¹(y))·|1/φ'(φ⁻¹(y))|</td>
+        </tr>
+        <tr>
+          <td><strong>Convolution</strong></td>
+          <td>X₁, X₂ 독립</td>
+          <td>f_{X₁+X₂} = f_{X₁} * f_{X₂}</td>
+        </tr>
+        <tr>
+          <td><strong>Independence (PDF)</strong></td>
+          <td>f_{X,Y} = g(x)·h(y), 직사각형 지지</td>
+          <td>X ⊥ Y</td>
+        </tr>
+        <tr>
+          <td><strong>Jensen</strong></td>
+          <td>g 볼록</td>
+          <td>E[g(X)] ≥ g(E[X])</td>
+        </tr>
+        <tr>
+          <td><strong>SLLN</strong></td>
+          <td>i.i.d., E|X|⁴ &lt; ∞</td>
+          <td>X̄_n → μ  a.s.</td>
+        </tr>
+      </table>
+    </div>
+  </section>
+
+</main>
+
+<a class="backtop" href="#" title="맨 위로">↑</a>
+
+<footer>
+  STAT221 · Introduction to Probability Theory · Korea University · 2026 Spring
+</footer>
+
+<script>
+  // Intersection Observer for fade-in
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.08 });
+
+  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
